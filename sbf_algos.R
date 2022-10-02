@@ -11,7 +11,7 @@ internal.function <- function( R, V2, delta ) {
 
 
 
-sbf.lattimore2014 <- function( f, T.max, m, budget.const, actual.nu, nu.lo=rep(1,length(m)) ) {
+sbf.lattimore2014 <- function( f, T.max, m, budgets, actual.nu, nu.lo=rep(1,length(m)) ) {
   
   # stopifnot( sum(budget.const-budget.const[1])==0 )
   
@@ -32,7 +32,7 @@ sbf.lattimore2014 <- function( f, T.max, m, budget.const, actual.nu, nu.lo=rep(1
       x[ixs[ix]] = min( nu.lo[ixs[ix]], 1-sum(x) )
     }
     
-    y = f( round(x*budget.const[t],2), actual.nu )
+    y = f( round(x*budgets[t],2), actual.nu )
   
     w = 1 / (1-x/nu.up)
     
@@ -48,14 +48,17 @@ sbf.lattimore2014 <- function( f, T.max, m, budget.const, actual.nu, nu.lo=rep(1
     
     eps = internal.function(R,V2,delta) / apply(W*X,2,sum)
     
-    nu.lo.inv = min( 1/nu.lo, v.inv_+eps )
-    nu.up.inv = max( 1/nu.up, v.inv_-eps )
+    nu.lo.inv = apply( cbind(1/nu.lo, v.inv_+eps),1, min )
+    nu.up.inv = apply( cbind(1/nu.up, v.inv_-eps),1, max )
     
     nu.lo = 1/nu.lo.inv
     nu.up = 1/nu.up.inv
     
   }
   
-  return( list(X=round(X*budget.const,2), A=X, OUT=OUT) )
+  A = X 
+  for( i in 1:ncol(X) ) 
+    X[,i] = round(X[,i] * budgets,2)
+  return( list(X=X, A=A, OUT=OUT) )
   
 }

@@ -30,9 +30,10 @@ t.max = 100
 save.results = T
 seed = 5
 stochastic = T
-constant.budget = F
+constant.budget = T
 
 lattimore2014 = T
+optimal.nu.lo.init = F
 
 set.seed(seed)
 
@@ -48,29 +49,48 @@ if( !constant.budget) {
 
 X = y = NULL
 
-# TODO: extends to >2 dimensions!
-if( nrow(search.space)!=2 ) {
-  stop("NOT IMPLEMENTED FOR",nrow(search.space),"ARMS!")
-}
-
 
 if( lattimore2014 ){
-  cat(" - (Lattimore et al. 2014)")
-  res = sbf.lattimore2014( f=f, T.max=t.max, m=length(nu), budget.const=bs,
-                           actual.nu=nu, nu.lo=c(0.1,0.9) )
+  cat(" - (Lattimore et al. 2014)\n")
+  if( optimal.nu.lo.init ) {
+    # nu.lo = c(0.1,0.9)
+    nu.lo = rep(NA,length(nu))
+    t = 1
+    cat("> Optimal initialization...\n")
+    while( length(which(is.na(nu.lo)))>0 ) {
+      alloc = rep(2^-t,length(nu.lo))
+      obs = f(alloc*bs[t],nu) # We must use the assumption of a constant budget because t --> Inf
+      ixs = which(obs$out==0)
+      nu.lo[which(is.na(nu.lo[ixs]))] = 2^-t
+      t = t+1
+    }
+    cat("...",t-1,"evaluations to initialize...\n")
+  } else {
+    cat("> Random initialization...\n")
+    nu.lo = rep(1/(0.5*length(nu)*(length(nu)+1)),length(nu))
+    # nu.lo[1] = round(1-sum(nu.lo[-1]),4)
+  }
+  
+  cat("...Done!\n")
+  res = sbf.lattimore2014( f=f, T.max=t.max, m=length(nu), budgets=bs,
+                           actual.nu=nu, nu.lo=nu.lo )
 } else {
   cat(" - (???????????)")
 }
 
 if( lattimore2014 ) {
-  fileName = "LATTIMORE2014"
+  if( optimal.nu.lo.init ) {
+    fileName = "LATTIMORE2014optinit"
+  } else {
+    fileName = "LATTIMORE2014rndinit"
+  }
 } else {
   fileName = "???????"
 }
   
 if( save.results ) {
-  results = data.frame( x1=res$X[,1], x2=res$X[,2], y=apply(res$OUT,1,sum) )
+  results = data.frame( X=res$X, A=res$A, y=apply(res$OUT,1,sum) )
   if( !dir.exists("results_case1") )
     dir.create("results_case1")
-  saveRDS( results, paste0("results_case1/",fileName,"_stoch_",stochastic,"_",seed,"_constbgt_",constant.budget,".RDS") )
+  saveRDS( results, paste0("results_case1/",fileName,"_stoch_",stochastic,"_",seed,"_constbgt_",constant.budget,"_arms_",length(nu),".RDS") )
 }

@@ -73,7 +73,8 @@ bora2_3.constraint <- function( x ) {
 wsek = function( x, y, sig, rho ) {
   x = round(x,2)
   y = round(y,2)
-  w = wasserstein(x,y,p=1,costm=1-diag(length(x)))
+  # w = wasserstein(x,y,p=1,costm=1-diag(length(x)))
+  w = 0.5 * sum(abs(x-y))
   return( (sig^2) * exp(-0.5*(w/rho))^2 )
 }
 
@@ -225,10 +226,15 @@ bora1 <- function( X, y, r.budget, search.space, maximize=T, beta_=1, covtype="g
   
   # optimizing the acquisition function constrained to the budget
   # be careful! slsqp minimizes fn!!!!
-  x0 = round(runif(1,search.space$lower[1],min(search.space$upper[1],r.budget)),2)
-  x0 = round(c(x0,min(search.space$upper[2],r.budget-x0)),2)
+  # x0 = round(runif(1,search.space$lower[1],min(search.space$upper[1],r.budget)),2)
+  # x0 = round(c(x0,min(search.space$upper[2],r.budget-x0)),2)
+  x0 = round(runif(ncol(X))*(search.space$upper-search.space$lower) + search.space$lower,2)
+  x0 = round( x0/sum(x0) * r.budget, 2)
+  # ...and just to be sure:
+  x0[which.max(x0)] = r.budget - sum(x0[-which.max(x0)])
+  
   globalpass.r.budget <<- r.budget
-  res = slsqp( x0=x0, fn=gpcb, heq=cbo.constraint, lower=search.space$lower, upper=search.space$upper,
+  res = slsqp( x0=x0, fn=gpcb1_2, heq=bora1.constraint,lower=search.space$lower, upper=search.space$upper,
                gp=gp, is.UCB=maximize, beta_=beta_ )
   
   return( list( res=res, gp=gp ) )
@@ -239,7 +245,7 @@ bora1 <- function( X, y, r.budget, search.space, maximize=T, beta_=1, covtype="g
 bora2 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F ) {
   
   stopifnot( is.data.frame(A) & is.vector(y) & nrow(A)==length(y) &
-               is.data.frame(search.space) & nrow(search.space)==ncol(X) )
+               is.data.frame(search.space) & nrow(search.space)==ncol(A) )
   
   # fitting the GP on the complete search space
   gp = km( design=A, response=y, covtype=covtype, nugget.estim=nugget.estim,
@@ -247,9 +253,13 @@ bora2 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F ) 
   
   # optimizing the acquisition function over the simplex
   # be careful! slsqp minimizes fn!!!!
-  a0 = round(runif(1),2)
-  a0 = round(c(a0,min(1,1-a0)),2)
-  res = slsqp( x0=a0, fn=gpcb, heq=bora.constraint, lower=rep(0,length(a0)), upper=rep(1,length(a0)),
+  # a0 = round(runif(1),2)
+  # a0 = round(c(a0,min(1,1-a0)),2)
+  a0 = round(runif(ncol(A)),2)
+  a0 = round( a0/sum(a0), 2)
+  # ...and just to be sure:
+  a0[which.max(a0)] = 1 - sum(a0[-which.max(a0)])
+  res = slsqp( x0=a0, fn=gpcb1_2, heq=bora2_3.constraint, lower=rep(0,length(a0)), upper=rep(1,length(a0)),
                gp=gp, is.UCB=maximize, beta_=beta_ )
   
   return( list( res=res, gp=gp ) )
@@ -260,18 +270,22 @@ bora2 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F ) 
 bora3 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F, n.proc=detectCores()-1 ) {
   
   stopifnot( is.matrix(A) & is.vector(y) & nrow(A)==length(y) &
-               is.data.frame(search.space) & nrow(search.space)==ncol(X) )
+               is.data.frame(search.space) & nrow(search.space)==ncol(A) )
   
   # fitting the GP with WSE kernel on the complete search space
   ss = data.frame(lower=10^c(-4,-4),upper=10^c(4,4), rownames=c("sigma","rho") )
-  start.at=Sys.time()
+  start.at = Sys.time()
   fs.res = focus.search.mle( X=A, y=y, par.search.space=ss, Np=20, tau=0.75, max.iter=100, early.stop=10 )
   cat("*** Focus-search elapsed time:",difftime(Sys.time(),start.at,units="secs"),"[secs]\n")
   
   # optimizing the acquisition function over the simplex
   # be careful! slsqp minimizes fn!!!!
-  a0 = round(runif(1),2)
-  a0 = round(c(a0,min(1,1-a0)),2)
+  # a0 = round(runif(1),2)
+  # a0 = round(c(a0,min(1,1-a0)),2)
+  a0 = round(runif(ncol(A)),2)
+  a0 = round( a0/sum(a0), 2)
+  # ...and just to be sure:
+  a0[which.max(a0)] = 1 - sum(a0[-which.max(a0)])
   res = slsqp( x0=a0, fn=gpcb3, heq=bora2_3.constraint, lower=rep(0,length(a0)), upper=rep(1,length(a0)),
                X=A, y=y, sig=fs.res$par[1], rho=fs.res$par[2], nugget=fs.res$par[3],
                is.UCB=maximize, beta_=beta_ )
