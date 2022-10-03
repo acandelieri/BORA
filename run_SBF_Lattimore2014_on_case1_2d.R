@@ -30,7 +30,7 @@ t.max = 100
 save.results = T
 seed = 5
 stochastic = T
-constant.budget = T
+constant.budget = F
 
 lattimore2014 = T
 optimal.nu.lo.init = F

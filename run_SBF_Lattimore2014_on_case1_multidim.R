@@ -28,12 +28,12 @@ t.max = 100
 # *********************************************************************
 
 save.results = T
-seed = 1
+seed = 5
 stochastic = T
-constant.budget = T
+constant.budget = F
 
 lattimore2014 = T
-optimal.nu.lo.init = T
+optimal.nu.lo.init = F
 
 set.seed(seed)
 
