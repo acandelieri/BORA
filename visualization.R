@@ -6,7 +6,9 @@ display.const.budget = F
 is.2D.case = F
 
 
-files = list.files("results_case1/")
+files = list.files("results_case1/",recursive=F)
+if( "BORA2-BORA3 (ok)" %in% files )
+  files = files[-which(files=="BORA2-BORA3 (ok)")]
 if( is.2D.case ) {
   files = files[-grep("arms_20",files,fixed=T)]
 } else {
@@ -73,7 +75,7 @@ for( s in unique(lat2014opt$seed) ) {
 # }
 # legend("bottomright",legend=c("BORA1","BORA2","BORA3","Lattimore et al.2014","Lattimore et al. 2014 (rand. init.)"),lwd=2,
 #        col=c("blue","green3","red","purple","black"))
-legend("bottomright",legend=c("BORA1","BORA2","BORA3","Lattimore et al.2014"),lwd=2,
+legend("bottomright",legend=c("BORA1","BORA2","BORA3","SBF"),lwd=2,
        col=c("blue","green3","red","purple"))
 
 b1.m = apply(b1M,2,mean)
@@ -114,8 +116,8 @@ if( nrow(lat2014optM)>1 ) {
 curr.mar = par("mar")
 par( mar=c(4.1,4.6,2.1,1.1) )
 
-plot( b1.m, type="l", ylim=c(0,Y.MAX), main=paste(ifelse(is.2D.case,"2 arms","20 arms"),"-",ifelse(display.const.budget,"Constant dudget","changing budget")),
-      cex.axis=1.5, cex.lab=1.5, xlab="time-step t", ylab=expression(log[10](R[t])))
+plot( b1.m, type="l", ylim=c(0,Y.MAX), main=paste(ifelse(is.2D.case,"2 arms","20 arms"),"-",ifelse(display.const.budget,"Constant budget","changing budget")),
+      cex.axis=1.5, cex.lab=1.5, xlab="time-step t", ylab=expression(paste("Cumulative Reward (",log[10],")" )) )
 polygon( c(1:length(b1.m),length(b1.m):1), c(b1.m+b1.s,rev(b1.m-b1.s)),
          col=adjustcolor("blue",alpha.f=0.2), border=NA )
 polygon( c(1:length(b2.m),length(b2.m):1), c(b2.m+b2.s,rev(b2.m-b2.s)),
@@ -133,7 +135,7 @@ lines( lat2014opt.m, col="purple",lwd=4 )
 # lines( lat2014rnd.m, col="black",lwd=4 )
 # legend("bottomright",legend=c("BORA1","BORA2","BORA3","Lattimore et al.2014","Lattimore et al. 2014 (rand. init.)"),lwd=3,
 #        col=c("blue","green3","red","purple","black"), cex=1.5)
-legend("bottomright",legend=c("BORA1","BORA2","BORA3","Lattimore et al.2014"),lwd=3,
+legend("bottomright",legend=c("BORA1","BORA2","BORA3","SBF"),lwd=3,
        col=c("blue","green3","red","purple"), cex=1.5)
 
 lines( log10(seq(1,length(b1.m),by=1)*(ncol(b1)-6)), lty=2, lwd=3, col="grey" )
@@ -154,8 +156,8 @@ par( mar=c(4.1,4.6,2.1,1.1) )
 
 Y.MAX = max((b1.m+b1.s)[t0:tf],(b2.m+b2.s)[t0:tf],(b2.m+b2.s)[t0:tf])
 Y.MIN = min((b1.m-b1.s)[t0:tf],(b2.m-b2.s)[t0:tf],(b2.m-b2.s)[t0:tf])
-plot( t0:tf, b1.m[t0:tf], type="l", ylim=c(Y.MIN,Y.MAX), main=paste(ifelse(is.2D.case,"2 arms","20 arms"),"-",ifelse(display.const.budget,"Constant dudget","changing budget")),
-      cex.axis=1.5, cex.lab=1.5, xlab="time-step t", ylab=expression(log[10](R[t])))
+plot( t0:tf, b1.m[t0:tf], type="l", ylim=c(Y.MIN,Y.MAX), main=paste(ifelse(is.2D.case,"2 arms","20 arms"),"-",ifelse(display.const.budget,"Constant budget","changing budget")),
+      cex.axis=1.5, cex.lab=1.5, xlab="time-step t", ylab=expression(paste("Cumulative Reward (",log[10],")" )) )
 polygon( c(t0:tf,tf:t0), c( (b1.m+b1.s)[t0:tf],rev((b1.m-b1.s)[t0:tf])),
          col=adjustcolor("blue",alpha.f=0.2), border=NA )
 polygon( c(t0:tf,tf:t0), c( (b2.m+b2.s)[t0:tf],rev((b2.m-b2.s)[t0:tf])),
