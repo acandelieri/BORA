@@ -33,7 +33,7 @@ stochastic = T
 constant.budget = F
 
 lattimore2014 = T
-optimal.nu.lo.init = F
+optimal.nu.lo.init = T
 
 set.seed(seed)
 

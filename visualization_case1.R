@@ -7,8 +7,6 @@ is.2D.case = F
 
 
 files = list.files("results_case1/",recursive=F)
-if( "BORA2-BORA3 (ok)" %in% files )
-  files = files[-which(files=="BORA2-BORA3 (ok)")]
 if( is.2D.case ) {
   files = files[-grep("arms_20",files,fixed=T)]
 } else {
@@ -65,7 +63,7 @@ for( s in unique(b3$seed) ) {
 }
 lat2014optM = NULL
 for( s in unique(lat2014opt$seed) ) {
-  lines( log10(cumsum(lat2014opt$y[which(lat2014opt$seed==s)])), col="red", lwd=2 )
+  lines( log10(cumsum(lat2014opt$y[which(lat2014opt$seed==s)])), col="purple", lwd=2 )
   lat2014optM = rbind(lat2014optM,log10(cumsum(lat2014opt$y[which(lat2014opt$seed==s)])))
 }
 # lat2014rndM = NULL
@@ -172,6 +170,11 @@ legend("bottomright",legend=c("BORA1","BORA2","BORA3"),lwd=3,
        col=c("blue","green3","red"), cex=1.5)
 
 par( mar=curr.mar )
+
+
+cat("BORA1's Averge Cumulative Reward at the end:",round(10^b1.m[length(b1.m)],2),"\n")
+cat("BORA2's Averge Cumulative Reward at the end:",round(10^b2.m[length(b2.m)],2),"\n")
+cat("BORA3's Averge Cumulative Reward at the end:",round(10^b3.m[length(b3.m)],2),"\n")
 
 
 # boxplot(apply(b1M,2,sum),apply(b2M,2,sum),apply(b3M,2,sum))

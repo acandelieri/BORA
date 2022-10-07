@@ -3,9 +3,6 @@ rm(list=ls()); graphics.off(); cat("\014")
 source("test_problems.R")
 source("core.R")
 
-library(DiceKriging)
-library(plot3D)
-
 
 # *********************************************************************
 # Case study specific parameters 

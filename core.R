@@ -244,8 +244,7 @@ bora1 <- function( X, y, r.budget, search.space, maximize=T, beta_=1, covtype="g
 # BORA_2 algorithm
 bora2 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F ) {
   
-  stopifnot( is.data.frame(A) & is.vector(y) & nrow(A)==length(y) &
-               is.data.frame(search.space) & nrow(search.space)==ncol(A) )
+  stopifnot( is.data.frame(A) & is.vector(y) & nrow(A)==length(y) )
   
   # fitting the GP on the complete search space
   gp = km( design=A, response=y, covtype=covtype, nugget.estim=nugget.estim,
@@ -269,8 +268,7 @@ bora2 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F ) 
 # BORA_3 algorithm
 bora3 <- function( A, y, maximize=T, beta_=1, covtype="gauss", nugget.estim=F, n.proc=detectCores()-1 ) {
   
-  stopifnot( is.matrix(A) & is.vector(y) & nrow(A)==length(y) &
-               is.data.frame(search.space) & nrow(search.space)==ncol(A) )
+  stopifnot( is.matrix(A) & is.vector(y) & nrow(A)==length(y) )
   
   # fitting the GP with WSE kernel on the complete search space
   ss = data.frame(lower=10^c(-4,-4),upper=10^c(4,4), rownames=c("sigma","rho") )

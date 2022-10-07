@@ -44,7 +44,7 @@ t.max = 100
 # *********************************************************************
 
 save.results = T
-seed = 3
+seed = 5
 constant.budget = F
 
 set.seed(seed)
@@ -89,8 +89,8 @@ for( t in 1:t.max ) {
   X = rbind(X,x.next)
   y.next = f( x.next, ni.mu, ni.sd )
 
-  y = c(y,y.next)
-  cat(" - y.next =",y.next,"\n")
+  y = c(y,y.next$value)
+  cat(" - y.next =",y.next$value,"\n")
   
 }
 

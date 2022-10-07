@@ -42,7 +42,7 @@ n.proc = detectCores()-1
 save.results = T
 seed = 5
 stochastic = T
-constant.budget = T
+constant.budget = F
 
 set.seed(seed)
 
