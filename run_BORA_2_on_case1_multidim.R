@@ -28,15 +28,17 @@ t.max = 100
 # *********************************************************************
 
 save.results = T
-seed = 5
+seed = 22
 stochastic = T
-constant.budget = F
+constant.budget = T
 
 set.seed(seed)
 
 # *********************************************************************
 # MAIN
 # *********************************************************************
+
+elapsed <- Sys.time()
 
 if( !constant.budget) {
   bs = round( runif(t.max) * (max.budget-min.budget) + min.budget, 2)
@@ -78,6 +80,8 @@ for( t in 1:t.max ) {
   cat(" - y.next =",y.next,"\n")
   
 }
+
+cat("\n> Elapsed time:",difftime(Sys.time(),elapsed,units="secs"),"[secs]\n\n")
 
 if( save.results ) {
   results = data.frame( X=X, A=A, y=y )

@@ -28,7 +28,7 @@ t.max = 100
 # *********************************************************************
 
 save.results = T
-seed = 5
+seed = 30
 stochastic = T
 constant.budget = F
 
@@ -40,6 +40,8 @@ set.seed(seed)
 # *********************************************************************
 # MAIN
 # *********************************************************************
+
+elapsed <- Sys.time()
 
 if( !constant.budget) {
   bs = round( runif(t.max) * (max.budget-min.budget) + min.budget, 2)
@@ -87,6 +89,8 @@ if( lattimore2014 ) {
 } else {
   fileName = "???????"
 }
+
+cat("\n> Elapsed time:",difftime(Sys.time(),elapsed,units="secs"),"[secs]\n\n")
   
 if( save.results ) {
   results = data.frame( X=res$X, A=res$A, y=apply(res$OUT,1,sum) )

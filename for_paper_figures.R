@@ -6,11 +6,11 @@ library(plot3D)
 
 # best pictures:
 # a) seed=1 & iter.lim=5
-# b) 
+# b) seed=3 & iter.lim=8
 seed = 3
 is.const.budget = T
 n.pts = 100
-iter.lim = 10
+iter.lim = 8
 
 set.seed(seed)
 

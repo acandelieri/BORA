@@ -137,7 +137,7 @@ legend("bottomright",legend=c("BORA1","BORA2","BORA3","SBF"),lwd=3,
        col=c("blue","green3","red","purple"), cex=1.5)
 
 lines( log10(seq(1,length(b1.m),by=1)*(ncol(b1)-6)), lty=2, lwd=3, col="grey" )
-legend("topleft",legend="utopic",col="grey",lwd=2,lty=2,cex=1.5)
+legend("topleft",legend="utopian",col="grey",lwd=2,lty=2,cex=1.5)
 
 par( mar=curr.mar )
 
