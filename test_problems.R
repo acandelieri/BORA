@@ -22,7 +22,3 @@ case2 <- function(x.t, ni.mu, ni.sd ) {
   
   return( list(value=round(sum(terms),2), terms=terms) ) 
 }
-
-
-
-
